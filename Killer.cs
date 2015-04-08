@@ -174,7 +174,7 @@ namespace EarlyDeath
             base.OnUpdate(realTimeDelta, simulationTimeDelta);
         }
 
-        public override void OnReleased ()
+        public override void OnReleased()
         {
             _initialized = false;
             _terminated = false;
