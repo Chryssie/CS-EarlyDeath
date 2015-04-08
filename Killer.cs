@@ -64,8 +64,8 @@ namespace EarlyDeath
                 {
                     try
                     {
-                        SkylinesOverwatch.Settings.Instance.Disabled.HumanMonitor     = false;
-                        SkylinesOverwatch.Settings.Instance.Disabled.Residents        = false;
+                        SkylinesOverwatch.Settings.Instance.Enable.HumanMonitor     = true;
+                        SkylinesOverwatch.Settings.Instance.Enable.Residents        = true;
 
                         _data = SkylinesOverwatch.Data.Instance;
                     }
