@@ -5,6 +5,7 @@ using System.Threading;
 using ICities;
 using ColossalFramework;
 using ColossalFramework.Math;
+using ColossalFramework.Plugins;
 using ColossalFramework.UI;
 using UnityEngine;
 
@@ -15,12 +16,21 @@ namespace EarlyDeath
         private Settings _settings;
         private Helper _helper;
 
-        private SkylinesOverwatch.Data _data;
-
         private bool _initialized;
         private bool _terminated;
 
         private Randomizer _randomizer;
+
+        protected bool IsOverwatched()
+        {
+            foreach (var plugin in PluginManager.instance.GetPluginsInfo())
+            {
+                if (plugin.publishedFileID.AsUInt64 == 421028969)
+                    return true;
+            }
+                
+            return false;
+        }
 
         public override void OnCreated(IThreading threading)
         {
@@ -35,19 +45,15 @@ namespace EarlyDeath
 
         public override void OnBeforeSimulationTick()
         {
-            try
+            if (_terminated) return;
+
+            /*
+            if (!SkylinesOverwatch.Helper.Instance.GameLoaded)
             {
-                if (!SkylinesOverwatch.Helper.Instance.GameLoaded)
-                {
-                    _initialized = false;
-                    return;
-                }
+                _initialized = false;
+                return;
             }
-            catch (Exception e)
-            {
-                _helper.Log("[ARIS] Skylines Overwatch not found. Unloading...");
-                _terminated = true;
-            }
+            */
 
             base.OnBeforeSimulationTick();
         }
@@ -58,22 +64,20 @@ namespace EarlyDeath
 
             try
             {
-                if (!SkylinesOverwatch.Helper.Instance.GameLoaded) return;
+                //if (!SkylinesOverwatch.Helper.Instance.GameLoaded) return;
 
                 if (!_initialized)
                 {
-                    try
+                    if (!IsOverwatched())
                     {
-                        SkylinesOverwatch.Settings.Instance.Enable.HumanMonitor     = true;
-                        SkylinesOverwatch.Settings.Instance.Enable.Residents        = true;
-
-                        _data = SkylinesOverwatch.Data.Instance;
-                    }
-                    catch (Exception e)
-                    {
-                        _helper.Log("[ARIS] Skylines Overwatch not found. Unloading...");
+                        _helper.Log("[ARIS] Skylines Overwatch not found. Terminating...");
                         _terminated = true;
+
+                        return;
                     }
+                                           
+                    SkylinesOverwatch.Settings.Instance.Enable.HumanMonitor = true;
+                    SkylinesOverwatch.Settings.Instance.Enable.Residents    = true;
 
                     _randomizer = Singleton<SimulationManager>.instance.m_randomizer;
 
@@ -86,55 +90,9 @@ namespace EarlyDeath
 
                     _helper.Log(String.Format("Initialized with {0:P2} chance of surviving to the end", probability));
                 }
-                else if (_data.HumansUpdated.Length > 0)
+                else
                 {
-                    CitizenManager instance = Singleton<CitizenManager>.instance;
-
-                    foreach (uint i in _data.HumansUpdated)
-                    {
-                        Citizen resident = instance.m_citizens.m_buffer[(int)i];
-
-                        if (resident.Dead)
-                            continue;
-
-                        if ((resident.m_flags & Citizen.Flags.Created) == Citizen.Flags.None)
-                            continue;
-
-                        CitizenInfo info = resident.GetCitizenInfo(i);
-
-                        if (info == null)
-                            continue;
-
-                        if (!(info.m_citizenAI is ResidentAI))
-                            continue;
-
-                        if (!Kill(resident))
-                            continue;
-
-                        resident.Sick = false;
-                        resident.Dead = true;
-                        resident.SetParkedVehicle(i, 0);
-
-                        ushort home = resident.GetBuildingByLocation();
-
-                        if (home == 0)
-                            home = resident.m_homeBuilding;
-
-                        if (home != 0)
-                        {
-                            DistrictManager dm = Singleton<DistrictManager>.instance;
-
-                            Vector3 position = Singleton<BuildingManager>.instance.m_buildings.m_buffer[(int)home].m_position;
-
-                            byte district = dm.GetDistrict(position);
-
-                            District[] buffer = dm.m_districts.m_buffer;
-                            buffer[(int)district].m_deathData.m_tempCount = buffer[(int)district].m_deathData.m_tempCount + 1;
-                        }
-
-                        if (_randomizer.Int32(2) == 0)
-                            instance.ReleaseCitizen(i);
-                    }
+                    ProcessHumansUpdated();
                 }
             }
             catch (Exception e)
@@ -161,6 +119,61 @@ namespace EarlyDeath
             base.OnReleased();
         }
 
+        private void ProcessHumansUpdated()
+        {
+            uint[] entries = SkylinesOverwatch.Data.Instance.HumansUpdated;
+
+            if (entries.Length == 0) return;
+
+            CitizenManager instance = Singleton<CitizenManager>.instance;
+
+            foreach (uint i in entries)
+            {
+                Citizen resident = instance.m_citizens.m_buffer[(int)i];
+
+                if (resident.Dead)
+                    continue;
+
+                if ((resident.m_flags & Citizen.Flags.Created) == Citizen.Flags.None)
+                    continue;
+
+                CitizenInfo info = resident.GetCitizenInfo(i);
+
+                if (info == null)
+                    continue;
+
+                if (!(info.m_citizenAI is ResidentAI))
+                    continue;
+
+                if (!Kill(resident))
+                    continue;
+
+                resident.Sick = false;
+                resident.Dead = true;
+                resident.SetParkedVehicle(i, 0);
+
+                ushort home = resident.GetBuildingByLocation();
+
+                if (home == 0)
+                    home = resident.m_homeBuilding;
+
+                if (home != 0)
+                {
+                    DistrictManager dm = Singleton<DistrictManager>.instance;
+
+                    Vector3 position = Singleton<BuildingManager>.instance.m_buildings.m_buffer[(int)home].m_position;
+
+                    byte district = dm.GetDistrict(position);
+
+                    District[] buffer = dm.m_districts.m_buffer;
+                    buffer[(int)district].m_deathData.m_tempCount = buffer[(int)district].m_deathData.m_tempCount + 1;
+                }
+
+                if (_randomizer.Int32(2) == 0)
+                    instance.ReleaseCitizen(i);
+            }
+        }
+
         private bool Kill(Citizen resident)
         {
             int bracket = resident.Age >> 4 & 31;
@@ -168,8 +181,8 @@ namespace EarlyDeath
             /*
              * Handle "super seniors" whose age is not possible in the actual game,
              * but is made like this through slow aging mods. Let the game deal
-             * with their death, since those mods are built assuming the game's 
-             * kill mechanism. This is also the reason why we did & 31 instead of 
+             * with their death, since those mods are built assuming the game's
+             * kill mechanism. This is also the reason why we did & 31 instead of
              * & 15 in the previous step.
              */
             if (bracket > 15)
