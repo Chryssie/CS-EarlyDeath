@@ -81,7 +81,7 @@ namespace EarlyDeath
 
                     float probability = 1;
 
-                    foreach (int i in _settings.DeathRate.Values)
+                    foreach (int i in _settings.DeathRate)
                         probability = probability * (1000 - i) / 1000;
 
                     _helper.Log(String.Format("Initialized with {0:P2} chance of surviving to the end", probability));
@@ -108,28 +108,7 @@ namespace EarlyDeath
                         if (!(info.m_citizenAI is ResidentAI))
                             continue;
 
-                        int age = resident.Age;
-                        bool kill = false;
-
-                        if      (age < 15)  kill = Kill( 15, resident);
-                        else if (age < 30)  kill = Kill( 30, resident); // teen
-                        else if (age < 45)  kill = Kill( 45, resident);
-                        else if (age < 60)  kill = Kill( 60, resident); // young
-                        else if (age < 75)  kill = Kill( 75, resident);
-                        else if (age < 90)  kill = Kill( 90, resident);
-                        else if (age < 105) kill = Kill(105, resident); // adult
-                        else if (age < 120) kill = Kill(120, resident);
-                        else if (age < 135) kill = Kill(135, resident);
-                        else if (age < 150) kill = Kill(150, resident);
-                        else if (age < 165) kill = Kill(165, resident);
-                        else if (age < 180) kill = Kill(180, resident);
-                        else if (age < 195) kill = Kill(195, resident); // senior
-                        else if (age < 210) kill = Kill(210, resident);
-                        else if (age < 225) kill = Kill(225, resident);
-                        else if (age < 240) kill = Kill(240, resident);
-                        else                kill = Kill(255, resident);
-
-                        if (!kill)
+                        if (!Kill(resident))
                             continue;
 
                         resident.Sick = false;
@@ -182,15 +161,27 @@ namespace EarlyDeath
             base.OnReleased();
         }
 
-        private bool Kill(int age, Citizen resident)
+        private bool Kill(Citizen resident)
         {
-            int rate = _settings.DeathRate[age];
+            int bracket = resident.Age >> 4 & 31;
+
+            /*
+             * Handle "super seniors" whose age is not possible in the actual game,
+             * but is made like this through slow aging mods. Let the game deal
+             * with their death, since those mods are built assuming the game's 
+             * kill mechanism. This is also the reason why we did & 31 instead of 
+             * & 15 in the previous step.
+             */
+            if (bracket > 15)
+                return false;
+
+            int rate = _settings.DeathRate[bracket];
 
             rate += resident.BadHealth      * 10;
-            rate += resident.NoElectricity  * 5;
+            rate += resident.NoElectricity  *  5;
             rate += resident.NoSewage       * 10;
             rate += resident.NoWater        * 10;
-            rate += resident.Unemployed     * 1;
+            rate += resident.Unemployed     *  1;
 
             if (resident.Education1)    rate -= 5;
             if (resident.Education2)    rate -= 3;
@@ -202,7 +193,8 @@ namespace EarlyDeath
 
             rate += _randomizer.Int32(-25, 25); // Luck
 
-            if (rate < 1) rate = 1;
+            if (rate <= 0)
+                return false;
 
             return _randomizer.Int32((uint)(1000 / rate)) == 0;
         }

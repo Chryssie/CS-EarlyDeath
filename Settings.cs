@@ -9,32 +9,31 @@ namespace EarlyDeath
         {
             Tag = "[ARIS] Early Death";
 
-            DeathRate = new Dictionary<int, int>();
+            DeathRate = new int[16];
 
             // Probability given in permille (per 1000)
-            DeathRate.Add( 15,   5);
-            DeathRate.Add( 30,  10); // teen
-            DeathRate.Add( 45,  10);
-            DeathRate.Add( 60,  30); // young
-            DeathRate.Add( 75,  20);
-            DeathRate.Add( 90,  15);
-            DeathRate.Add(105,  10); // adult
-            DeathRate.Add(120,   5);
-            DeathRate.Add(135,   5);
-            DeathRate.Add(150,  10);
-            DeathRate.Add(165,  15);
-            DeathRate.Add(180,  20);
-            DeathRate.Add(195,  30); // senior
-            DeathRate.Add(210,  45);
-            DeathRate.Add(225,  60);
-            DeathRate.Add(240,  80);
-            DeathRate.Add(255,   1); // let game death rate take over
+            DeathRate[ 0] =  5;
+            DeathRate[ 1] = 10; // teen
+            DeathRate[ 2] = 10;
+            DeathRate[ 3] = 30; // young
+            DeathRate[ 4] = 20;
+            DeathRate[ 5] = 15;
+            DeathRate[ 6] = 10; // adult
+            DeathRate[ 7] =  5;
+            DeathRate[ 8] =  5;
+            DeathRate[ 9] = 10;
+            DeathRate[10] = 15;
+            DeathRate[11] = 20;
+            DeathRate[12] = 30; // senior
+            DeathRate[13] = 45;
+            DeathRate[14] = 60;
+            DeathRate[15] = 80;
         }
 
         private static readonly Settings _Instance = new Settings();
         public static Settings Instance { get { return _Instance; } }
 
         public readonly string Tag;
-        public readonly Dictionary<int, int> DeathRate;
+        public readonly int[] DeathRate;
     }
 }
