@@ -47,13 +47,11 @@ namespace EarlyDeath
         {
             if (_terminated) return;
 
-            /*
-            if (!SkylinesOverwatch.Helper.Instance.GameLoaded)
+            if (!_helper.GameLoaded)
             {
                 _initialized = false;
                 return;
             }
-            */
 
             base.OnBeforeSimulationTick();
         }
@@ -62,10 +60,10 @@ namespace EarlyDeath
         {
             if (_terminated) return;
 
+            if (!_helper.GameLoaded) return;
+
             try
             {
-                //if (!SkylinesOverwatch.Helper.Instance.GameLoaded) return;
-
                 if (!_initialized)
                 {
                     if (!IsOverwatched())
