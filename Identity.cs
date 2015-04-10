@@ -11,7 +11,7 @@ namespace EarlyDeath
 
         public string Description
         {
-            get { return "Nonpermanently adds the possibility for your CIMs to die early. Disable to get the normal perfect life back. Requires [ARIS] Skylines Overwatch."; }
+            get { return "Nonpermanently adds the possibility for your CIMs to die early. Disable to get the normal perfect life back."; }
         }
     }
 }
