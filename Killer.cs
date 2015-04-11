@@ -23,29 +23,21 @@ namespace EarlyDeath
 
         protected bool IsOverwatched()
         {
-            ulong skylinesOverwatchID;
-
             #if DEBUG
 
             return true;
 
-            #elif PTR
-
-            skylinesOverwatchID = 422560684;
-
             #else
-
-            skylinesOverwatchID = 421028969;
-
-            #endif
 
             foreach (var plugin in PluginManager.instance.GetPluginsInfo())
             {
-                if (plugin.publishedFileID.AsUInt64 == skylinesOverwatchID)
+                if (plugin.publishedFileID.AsUInt64 == 421028969)
                     return true;
             }
-                
+
             return false;
+
+            #endif
         }
 
         public override void OnCreated(IThreading threading)
@@ -84,14 +76,16 @@ namespace EarlyDeath
                 {
                     if (!IsOverwatched())
                     {
-                        _helper.Log(_settings.Flair + " Skylines Overwatch not found. Terminating...");
+                        _helper.Log("Skylines Overwatch not found. Terminating...");
                         _terminated = true;
 
                         return;
                     }
-                                           
+
                     SkylinesOverwatch.Settings.Instance.Enable.HumanMonitor = true;
                     SkylinesOverwatch.Settings.Instance.Enable.Residents    = true;
+
+                    SkylinesOverwatch.Settings.Instance.Debug.HumanMonitor  = true;
 
                     _randomizer = Singleton<SimulationManager>.instance.m_randomizer;
 

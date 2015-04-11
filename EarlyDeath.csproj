@@ -18,7 +18,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -27,14 +26,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'PTR|AnyCPU' ">
-    <Optimize>false</Optimize>
-    <OutputPath>..\..\..\Library\Application Support\Steam\SteamApps\workshop\content\255710\422567849</OutputPath>
-    <WarningLevel>4</WarningLevel>
-    <DebugSymbols>true</DebugSymbols>
-    <DefineConstants>PTR;</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -48,10 +39,6 @@
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\References\UnityEngine.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="SkylinesOverwatch">
-      <HintPath>..\..\..\Library\Application Support\Colossal Order\Cities_Skylines\Addons\Mods\SkylinesOverwatch\SkylinesOverwatch.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="ICities">
@@ -72,4 +59,11 @@
     <Compile Include="Loader.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\SkylinesOverwatch\SkylinesOverwatch.csproj">
+      <Project>{8C40A7D8-724B-40D9-A149-C938CB210E3C}</Project>
+      <Name>SkylinesOverwatch</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
 </Project>
