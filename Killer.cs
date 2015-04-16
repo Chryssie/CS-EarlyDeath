@@ -83,8 +83,6 @@ namespace EarlyDeath
                     }
 
                     SkylinesOverwatch.Settings.Instance.Enable.HumanMonitor = true;
-                    SkylinesOverwatch.Settings.Instance.Enable.Residents    = true;
-
                     SkylinesOverwatch.Settings.Instance.Debug.HumanMonitor  = true;
 
                     _randomizer = Singleton<SimulationManager>.instance.m_randomizer;
