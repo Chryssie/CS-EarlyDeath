@@ -127,14 +127,18 @@ namespace EarlyDeath
 
         private void ProcessHumansUpdated()
         {
-            uint[] entries = SkylinesOverwatch.Data.Instance.HumansUpdated;
+            uint[] humans = SkylinesOverwatch.Data.Instance.HumansUpdated;
 
-            if (entries.Length == 0) return;
+            if (humans.Length == 0) return;
 
             CitizenManager instance = Singleton<CitizenManager>.instance;
+            HashSet<uint> residents = new HashSet<uint>(SkylinesOverwatch.Data.Instance.Residents);
 
-            foreach (uint i in entries)
+            foreach (uint i in humans)
             {
+                if (!residents.Contains(i))
+                    continue;
+
                 Citizen resident = instance.m_citizens.m_buffer[(int)i];
 
                 if (resident.Dead)
@@ -143,12 +147,7 @@ namespace EarlyDeath
                 if ((resident.m_flags & Citizen.Flags.Created) == Citizen.Flags.None)
                     continue;
 
-                CitizenInfo info = resident.GetCitizenInfo(i);
-
-                if (info == null)
-                    continue;
-
-                if (!(info.m_citizenAI is ResidentAI))
+                if ((resident.m_flags & Citizen.Flags.DummyTraffic) != Citizen.Flags.None)
                     continue;
 
                 if (!Kill(resident))
@@ -177,6 +176,8 @@ namespace EarlyDeath
 
                 if (_randomizer.Int32(2) == 0)
                     instance.ReleaseCitizen(i);
+
+                SkylinesOverwatch.Helper.Instance.RequestHumanRemoval(i);
             }
         }
 
