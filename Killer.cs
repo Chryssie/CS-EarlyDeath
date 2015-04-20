@@ -126,16 +126,16 @@ namespace EarlyDeath
 
         private void ProcessHumansUpdated()
         {
-            uint[] humans = SkylinesOverwatch.Data.Instance.HumansUpdated;
+            SkylinesOverwatch.Data data = SkylinesOverwatch.Data.Instance;
+            uint[] humans = data.HumansUpdated;
 
             if (humans.Length == 0) return;
 
             CitizenManager instance = Singleton<CitizenManager>.instance;
-            HashSet<uint> residents = new HashSet<uint>(SkylinesOverwatch.Data.Instance.Residents);
 
             foreach (uint i in humans)
             {
-                if (!residents.Contains(i))
+                if (!data.isResident(i))
                     continue;
 
                 Citizen resident = instance.m_citizens.m_buffer[(int)i];
