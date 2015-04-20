@@ -135,7 +135,7 @@ namespace EarlyDeath
 
             foreach (uint i in humans)
             {
-                if (!data.isResident(i))
+                if (!data.IsResident(i))
                     continue;
 
                 Citizen resident = instance.m_citizens.m_buffer[(int)i];
