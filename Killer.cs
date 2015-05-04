@@ -76,7 +76,7 @@ namespace EarlyDeath
                 {
                     if (!IsOverwatched())
                     {
-                        _helper.Log("Skylines Overwatch not found. Terminating...");
+                        _helper.NotifyPlayer("Skylines Overwatch not found. Terminating...");
                         _terminated = true;
 
                         return;
@@ -93,7 +93,7 @@ namespace EarlyDeath
                     foreach (int i in _settings.DeathRate)
                         probability = probability * (1000 - i) / 1000;
 
-                    _helper.Log(String.Format("Initialized with {0:P2} chance of surviving to the end", probability));
+                    _helper.NotifyPlayer(String.Format("Initialized with {0:P2} chance of surviving to the end", probability));
                 }
                 else
                 {
@@ -102,7 +102,7 @@ namespace EarlyDeath
             }
             catch (Exception e)
             {
-                string error = "Failed to initialize\r\n";
+                string error = String.Format("Failed to {0}\r\n", !_initialized ? "initialize" : "updated");
                 error += String.Format("Error: {0}\r\n", e.Message);
                 error += "\r\n";
                 error += "==== STACK TRACE ====\r\n";
@@ -110,7 +110,8 @@ namespace EarlyDeath
 
                 _helper.Log(error);
 
-                _terminated = true;
+                if (!_initialized)
+                    _terminated = true;
             }
 
             base.OnUpdate(realTimeDelta, simulationTimeDelta);
@@ -138,7 +139,8 @@ namespace EarlyDeath
                 if (!data.IsResident(i))
                     continue;
 
-                Citizen resident = instance.m_citizens.m_buffer[(int)i];
+                Citizen[] residents = instance.m_citizens.m_buffer;
+                Citizen resident = residents[(int)i];
 
                 if (resident.Dead)
                     continue;
@@ -152,9 +154,9 @@ namespace EarlyDeath
                 if (!Kill(resident))
                     continue;
 
-                resident.Sick = false;
-                resident.Dead = true;
-                resident.SetParkedVehicle(i, 0);
+                residents[(int)i].Sick = false;
+                residents[(int)i].Dead = true;
+                residents[(int)i].SetParkedVehicle(i, 0);
 
                 ushort home = resident.GetBuildingByLocation();
 
