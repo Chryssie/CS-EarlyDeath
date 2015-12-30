@@ -7,7 +7,7 @@ namespace EarlyDeath
     {
         private Settings()
         {
-            Tag = "[ARIS] Early Death";
+            Tag = "Early Death [Fixed for v1.2]";
 
             DeathRate = new int[16];
 

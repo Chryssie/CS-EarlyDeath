@@ -31,7 +31,7 @@ namespace EarlyDeath
 
             foreach (var plugin in PluginManager.instance.GetPluginsInfo())
             {
-                if (plugin.publishedFileID.AsUInt64 == 421028969)
+                if (plugin.publishedFileID.AsUInt64 == 583538182)
                     return true;
             }
 
