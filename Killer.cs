@@ -95,7 +95,7 @@ namespace EarlyDeath
 
                     _helper.NotifyPlayer(String.Format("Initialized with {0:P2} chance of surviving to the end", probability));
                 }
-                else
+                else if(!SimulationManager.instance.SimulationPaused)
                 {
                     ProcessHumansUpdated();
                 }
@@ -217,7 +217,7 @@ namespace EarlyDeath
             if (rate <= 0)
                 return false;
 
-            return _randomizer.Int32((uint)(1000 / rate)) == 0;
+            return _randomizer.Int32(1000) < rate;
         }
     }
 }
