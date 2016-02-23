@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace EarlyDeath
+﻿namespace EarlyDeath
 {
     public sealed class Settings
     {
         private Settings()
         {
-            Tag = "Early Death [Fixed for v1.2]";
+            Tag = "Early Death [Fixed for v1.3]";
 
             DeathRate = new int[16];
 

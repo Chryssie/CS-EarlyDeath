@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-
-using ICities;
-using ColossalFramework;
+﻿using ColossalFramework;
 using ColossalFramework.Math;
 using ColossalFramework.Plugins;
-using ColossalFramework.UI;
+using ICities;
+using System;
 using UnityEngine;
 
 namespace EarlyDeath
