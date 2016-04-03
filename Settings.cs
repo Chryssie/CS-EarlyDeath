@@ -4,7 +4,7 @@
     {
         private Settings()
         {
-            Tag = "Early Death [Fixed for v1.3]";
+            Tag = "Early Death [Fixed for v1.4+]";
 
             DeathRate = new int[16];
 
